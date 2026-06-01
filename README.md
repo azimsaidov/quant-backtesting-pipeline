@@ -49,16 +49,28 @@ $$
 $$
 
 Where:
-*   **Bollinger Bands (BB)**:
-    $BB_{\text{mid}} = \text{SMA}(P_{\text{Close}}, N_{\text{BB}})$
-    $BB_{\text{upper}} = BB_{\text{mid}} + (k_{\text{BB}} \cdot \sigma_{N_{\text{BB}}})$
-    $BB_{\text{lower}} = BB_{\text{mid}} - (k_{\text{BB}} \cdot \sigma_{N_{\text{BB}}})$
-    *($N_{\text{BB}} = 20, k_{\text{BB}} = 2.0$)*
-*   **Keltner Channels (KC)**:
-    $KC_{\text{mid}} = \text{SMA}(P_{\text{Close}}, N_{\text{KC}})$
-    $KC_{\text{upper}} = KC_{\text{mid}} + (k_{\text{KC}} \cdot \text{ATR}_{N_{\text{KC}}})$
-    $KC_{\text{lower}} = KC_{\text{mid}} - (k_{\text{KC}} \cdot \text{ATR}_{N_{\text{KC}}})$
-    *($N_{\text{KC}} = 20, k_{\text{KC}} = 1.5$)*
+*   **Bollinger Bands (BB)**: Standard deviation volatility bands around a moving average.
+$$
+BB_{\text{mid}} = \text{SMA}(P_{\text{Close}}, N_{\text{BB}})
+$$
+$$
+BB_{\text{upper}} = BB_{\text{mid}} + (k_{\text{BB}} \cdot \sigma_{N_{\text{BB}}})
+$$
+$$
+BB_{\text{lower}} = BB_{\text{mid}} - (k_{\text{BB}} \cdot \sigma_{N_{\text{BB}}})
+$$
+    *(Parameters: $N_{\text{BB}} = 20, k_{\text{BB}} = 2.0$)*
+*   **Keltner Channels (KC)**: Volatility channels built using Average True Range (ATR) boundaries.
+$$
+KC_{\text{mid}} = \text{SMA}(P_{\text{Close}}, N_{\text{KC}})
+$$
+$$
+KC_{\text{upper}} = KC_{\text{mid}} + (k_{\text{KC}} \cdot \text{ATR}_{N_{\text{KC}}})
+$$
+$$
+KC_{\text{lower}} = KC_{\text{mid}} - (k_{\text{KC}} \cdot \text{ATR}_{N_{\text{KC}}})
+$$
+    *(Parameters: $N_{\text{KC}} = 20, k_{\text{KC}} = 1.5$)*
 
 #### 2. Liquidity Contraction
 Liquidity is evaluated via the volume moving average:

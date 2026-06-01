@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumBacktest - Professional Backtesting Engine</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Sidebar Controls -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
+                <h1 class="brand-title">QuantumBacktest</h1>
+            </div>
+            
+            <!-- Data Selection Panel -->
+            <div class="panel">
+                <h2 class="panel-title">1. Data Selection</h2>
+                
+                <div class="form-group">
+                    <label for="ticker-select">Ticker Symbol</label>
+                    <select id="ticker-select">
+                        <!-- Tickers will be dynamically fetched -->
+                        <option value="SPY">SPY (S&P 500 ETF)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Or Upload Custom OHLCV CSV</label>
+                    <div class="upload-btn-wrapper">
+                        <div class="btn-upload" id="upload-label">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                            </svg>
+                            Choose custom CSV file
+                        </div>
+                        <input type="file" id="csv-file-input" accept=".csv" />
+                    </div>
+                    <div id="upload-status" class="text-success" style="font-size: 0.75rem; margin-top: 6px; display: none;"></div>
+                </div>
+            </div>
+            
+            <!-- Parameters Panel -->
+            <div class="panel">
+                <h2 class="panel-title">2. Account Settings</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="start-date">Start Date</label>
+                        <input type="date" id="start-date" value="2020-01-01" />
+                    </div>
+                    <div class="form-group">
+                        <label for="end-date">End Date</label>
+                        <input type="date" id="end-date" value="2023-01-01" />
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="initial-cash">Initial Capital ($)</label>
+                    <input type="number" id="initial-cash" value="10000" min="100" max="10000000" />
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="commission-rate">Commission (%)</label>
+                        <input type="number" id="commission-rate" value="0.15" min="0.0" max="2.0" step="0.01" />
+                    </div>
+                    <div class="form-group">
+                        <label for="slippage-rate">Slippage (%)</label>
+                        <input type="number" id="slippage-rate" value="0.05" min="0.0" max="2.0" step="0.01" />
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Strategy Configuration Panel -->
+            <div class="panel">
+                <h2 class="panel-title">3. Trading Strategy</h2>
+                
+                <div class="form-group">
+                    <label for="strategy-select">Select Strategy</label>
+                    <select id="strategy-select">
+                        <!-- Loaded dynamically -->
+                        <option value="vls">Volatility-Liquidity Squeeze</option>
+                    </select>
+                </div>
+                
+                <!-- Dynamic Strategy Hyperparameters Container -->
+                <div id="strategy-params-container">
+                    <!-- Javascript will insert inputs here dynamically -->
+                </div>
+            </div>
+            
+            <!-- Run Button -->
+            <button class="btn-primary" id="run-backtest-btn">
+                <span class="btn-text">Execute Backtest</span>
+                <div class="loader" id="btn-loader"></div>
+                <svg id="btn-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+            </button>
+        </aside>
+        
+        <!-- Main Dashboard Content -->
+        <main class="main-content">
+            
+            <!-- Header Navbar -->
+            <header class="navbar">
+                <h2 class="nav-title">Execution Terminal</h2>
+                <div class="nav-status">
+                    <div class="status-dot"></div>
+                    <span>System Online</span>
+                </div>
+            </header>
+            
+            <!-- Empty State / Splash Screen -->
+            <section class="empty-state" id="empty-state">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
+                </svg>
+                <h3 class="empty-state-title">Ready for Backtest Simulation</h3>
+                <p>Configure your historical parameters, select the Volatility-Liquidity Squeeze strategy, and execute to view trade diagnostics.</p>
+            </section>
+            
+            <!-- Dashboard Results Container (Initially Hidden) -->
+            <section class="dashboard-view" id="dashboard-view" style="display: none;">
+                
+                <!-- Performance Cards -->
+                <div class="metrics-grid" id="metrics-grid">
+                    <!-- Rendered dynamically -->
+                </div>
+                
+                <!-- Performance Charts -->
+                <div class="charts-grid">
+                    
+                    <!-- Equity Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Equity Curve vs Benchmark</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="equityChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Drawdown Profile Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Drawdown Profile (%)</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="drawdownChart"></canvas>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Detailed Trade Log Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3 class="table-title">Executed Trades History</h3>
+                        <input type="text" class="search-input" id="trade-search" placeholder="Search trade log..." />
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table id="trades-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="trade_id">ID</th>
+                                    <th data-sort="type">Type</th>
+                                    <th data-sort="date">Execution Date</th>
+                                    <th data-sort="price">Price</th>
+                                    <th data-sort="qty">Shares / Units</th>
+                                    <th data-sort="commission">Commission</th>
+                                    <th data-sort="return">Trade Return</th>
+                                    <th data-sort="pnl">PnL ($)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trades-table-body">
+                                <!-- Rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </section>
+        </main>
+        
+    </div>
+    
+    <!-- Script execution -->
+    <script src="app.js"></script>
+</body>
+</html>

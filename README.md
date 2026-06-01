@@ -1,5 +1,7 @@
 # QUANTITATIVE BACKTESTING PIPELINE
 
+![QuantumBacktest Execution Dashboard](assets/quantbacktestdash.png)
+
 A standalone, modular quantitative trading backtest engine and interactive web interface. Designed for historical testing of technical trading strategies, transaction accounting (slippage, commissions), and advanced portfolio metric calculation.
 
 ---
@@ -199,29 +201,3 @@ Initial capital was set to $10,000.00 with transaction commission rate at 0.15% 
 *   **Broad Market Indexes (SPY)**: **Exceptional Risk-Adjusted Returns.** The VLS strategy successfully protected capital, limiting maximum peak-to-trough drawdown to **-9.97%** compared to the passive index drawdown of **-33.72%** (a risk reduction of >70%). It delivered a high-efficiency **Sharpe Ratio of 1.14**.
 *   **High-Volatility / Trend Assets (QQQ, TSLA, BTC-USD)**: **Underperformance.** Because growth assets and cryptocurrencies consolidate rarely and trend aggressively, the squeeze parameters caused the system to remain in cash during massive upward runs, or enter false breakouts (whipsaws) in choppy regimes, severely lagging trend-following SMA Crossover systems.
 
----
-
-## 6. Adding Dashboard Screenshots
-
-To display visual interfaces directly inside your public GitHub repository:
-
-### Step 1: Create an Assets Directory
-In the project root folder, create a new subfolder:
-```bash
-mkdir assets
-```
-
-### Step 2: Capture and Save Screenshots
-Start the server, run a backtest simulation on your browser, and capture screenshots. Save these images inside the newly created `assets/` directory (e.g. `assets/dashboard_preview.png`).
-
-### Step 3: Embed in the README
-Add the following standard markdown syntax to the top of your `README.md` file (or right under the title):
-```markdown
-![QuantumBacktest Execution Dashboard](assets/dashboard_preview.png)
-```
-Commit the files and push them to your public repository:
-```bash
-git add assets/dashboard_preview.png README.md
-git commit -m "docs: add visual dashboard preview screenshot"
-git push origin main
-```

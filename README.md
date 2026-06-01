@@ -34,6 +34,13 @@ The pipeline consists of a Python 3.8+ FastAPI application backend and a static 
 ### The Volatility-Liquidity Squeeze Strategy (VLS)
 The primary strategy models periods of low asset price volatility and dry liquidity (coiled spring effect), followed by explosive breakouts on volume expansion.
 
+#### Origin, Theory, and Modern Evolution
+The concept of the volatility "Squeeze" was originally popularized in technical trading by John Carter in his work *Mastering the Trade*, where he formalized the "TTM Squeeze" indicator. The strategy is built on the core market principle that **volatility is cyclical**—periods of low volatility (consolidation) are inevitably followed by periods of high volatility (trends). In modern quantitative finance, this phenomenon is mathematically described as **Volatility Clustering** (originally identified by Benoit Mandelbrot and Eugene Fama), which asserts that price deviations cluster together in time.
+
+Historically, momentum strategies suffered heavy capital decay (drawdowns) in sideways, consolidation markets due to constant false crossover signals. Carter's innovation was to overlay standard deviation envelopes (**Bollinger Bands**) on top of Average True Range boundaries (**Keltner Channels**) to explicitly detect when an asset was building kinetic energy (a "squeeze" state where Bollinger Bands compress fully inside Keltner Channels). 
+
+In today's highly algorithmic, high-frequency trading (HFT) environments, a pure volatility squeeze is prone to high false-breakout rates (whipsaws) due to institutional algorithmic accumulation/distribution and spoofing. This pipeline implements a critical modern optimization: **The Liquidity Filter**. By ensuring that the consolidation period is accompanied by a severe contraction in trading volume (representing dried-up retail and speculative interest), and requiring a **liquidity surge** (volume expanding above its moving average) to confirm the breakout, the system successfully filters out false HFT breakouts, significantly improving risk-adjusted returns (Sharpe Ratios) on major indices.
+
 #### 1. Volatility Squeeze State
 A volatility squeeze occurs when the Bollinger Bands contract fully inside the Keltner Channels:
 $$\text{Squeeze Active} = (BB_{\text{upper}} < KC_{\text{upper}}) \land (BB_{\text{lower}} > KC_{\text{lower}})$$

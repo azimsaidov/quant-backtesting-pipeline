@@ -140,3 +140,8 @@ def run_backtest(req: BacktestRequest):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Backtest execution engine error: {str(e)}")
+
+# Mount static frontend files to serve single-port full-stack app
+from fastapi.staticfiles import StaticFiles
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")

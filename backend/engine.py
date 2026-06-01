@@ -149,20 +149,18 @@ class BacktestEngine:
         # Prepare strategy indicator curves for UI rendering
         ui_indicators = {}
         for ind_name, ind_series in strategy.indicators.items():
-            # Replace NaNs with None for JSON compliance
-            clean_series = ind_series.where(pd.notna(ind_series), None)
-            
-            # Convert series values appropriately
-            if clean_series.dtype == bool:
-                ui_indicators[ind_name] = [
-                    {"date": str(date.date()), "value": bool(val) if val is not None else None}
-                    for date, val in clean_series.items()
-                ]
-            else:
-                ui_indicators[ind_name] = [
-                    {"date": str(date.date()), "value": float(val) if val is not None else None}
-                    for date, val in clean_series.items()
-                ]
+            ui_indicators[ind_name] = []
+            for date, val in ind_series.items():
+                if pd.isna(val):
+                    clean_val = None
+                elif isinstance(val, (bool, np.bool_)):
+                    clean_val = bool(val)
+                else:
+                    clean_val = float(val)
+                ui_indicators[ind_name].append({
+                    "date": str(date.date()),
+                    "value": clean_val
+                })
                 
         return {
             "metrics": metrics,

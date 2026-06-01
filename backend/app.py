@@ -136,7 +136,28 @@ def run_backtest(req: BacktestRequest):
             slippage_rate=req.slippage_rate
         )
         results = engine.run()
-        return results
+        
+        # Clean up any potential float NaNs or Infs recursively before returning JSON
+        import numpy as np
+        def sanitize_floats(obj):
+            if isinstance(obj, dict):
+                return {k: sanitize_floats(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [sanitize_floats(v) for v in obj]
+            elif isinstance(obj, float):
+                if np.isnan(obj) or np.isinf(obj):
+                    return None
+                return obj
+            elif isinstance(obj, np.floating):
+                val = float(obj)
+                if np.isnan(val) or np.isinf(val):
+                    return None
+                return val
+            elif isinstance(obj, np.integer):
+                return int(obj)
+            return obj
+            
+        return sanitize_floats(results)
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Backtest execution engine error: {str(e)}")

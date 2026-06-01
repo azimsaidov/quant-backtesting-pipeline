@@ -44,52 +44,34 @@ In today's highly algorithmic, high-frequency trading (HFT) environments, a pure
 #### 1. Volatility Squeeze State
 A volatility squeeze occurs when the Bollinger Bands contract fully inside the Keltner Channels:
 
-$$
-\text{Squeeze Active} = (BB_{\text{upper}} < KC_{\text{upper}}) \land (BB_{\text{lower}} > KC_{\text{lower}})
-$$
+$$BB_{upper} < KC_{upper} \quad \text{and} \quad BB_{lower} > KC_{lower}$$
 
 Where:
 *   **Bollinger Bands (BB)**: Standard deviation volatility bands around a moving average.
-$$
-BB_{\text{mid}} = \text{SMA}(P_{\text{Close}}, N_{\text{BB}})
-$$
-$$
-BB_{\text{upper}} = BB_{\text{mid}} + (k_{\text{BB}} \cdot \sigma_{N_{\text{BB}}})
-$$
-$$
-BB_{\text{lower}} = BB_{\text{mid}} - (k_{\text{BB}} \cdot \sigma_{N_{\text{BB}}})
-$$
-    *(Parameters: $N_{\text{BB}} = 20, k_{\text{BB}} = 2.0$)*
+$$BB_{mid} = \text{SMA}(Close, N)$$
+$$BB_{upper} = BB_{mid} + k \cdot \sigma$$
+$$BB_{lower} = BB_{mid} - k \cdot \sigma$$
+    *(Parameters: $N = 20$, $k = 2.0$)*
 *   **Keltner Channels (KC)**: Volatility channels built using Average True Range (ATR) boundaries.
-$$
-KC_{\text{mid}} = \text{SMA}(P_{\text{Close}}, N_{\text{KC}})
-$$
-$$
-KC_{\text{upper}} = KC_{\text{mid}} + (k_{\text{KC}} \cdot \text{ATR}_{N_{\text{KC}}})
-$$
-$$
-KC_{\text{lower}} = KC_{\text{mid}} - (k_{\text{KC}} \cdot \text{ATR}_{N_{\text{KC}}})
-$$
-    *(Parameters: $N_{\text{KC}} = 20, k_{\text{KC}} = 1.5$)*
+$$KC_{mid} = \text{SMA}(Close, N)$$
+$$KC_{upper} = KC_{mid} + m \cdot ATR$$
+$$KC_{lower} = KC_{mid} - m \cdot ATR$$
+    *(Parameters: $N = 20$, $m = 1.5$)*
 
 #### 2. Liquidity Contraction
-Liquidity is evaluated via the volume moving average:
+Liquidity contraction is identified when trading volume falls below its average:
 
-$$
-\text{Liquidity Squeezed} = V_t < \text{SMA}(V, N_{\text{Vol}})
-$$
-*($N_{\text{Vol}} = 20$)*
+$$Volume < \text{SMA}(Volume, N)$$
+    *(Parameters: $N = 20$)*
 
 #### 3. Breakout / Entry Signal
 An entry trigger is generated when a squeeze has been active (either currently or in the previous period), volume expands, and price crosses the outer bands:
 
-$$
-\text{BUY (Bullish Breakout)} = \text{Squeeze Active}_{t-1, t} \land (V_t > \text{SMA}(V, N_{\text{Vol}})) \land (P_{\text{Close}, t} > BB_{\text{upper}, t})
-$$
+*   **Buy Signal (Bullish Breakout)**:
+$$Close_t > BB_{upper, t} \quad \text{and} \quad Volume_t > \text{SMA}(Volume, N)_t \quad \text{and} \quad \text{Squeeze Active}$$
 
-$$
-\text{SELL (Bearish Breakout)} = \text{Squeeze Active}_{t-1, t} \land (V_t > \text{SMA}(V, N_{\text{Vol}})) \land (P_{\text{Close}, t} < BB_{\text{lower}, t})
-$$
+*   **Sell Signal (Bearish Breakout)**:
+$$Close_t < BB_{lower, t} \quad \text{and} \quad Volume_t > \text{SMA}(Volume, N)_t \quad \text{and} \quad \text{Squeeze Active}$$
 
 ---
 
@@ -98,34 +80,24 @@ The system calculates daily equity adjustments and returns standard quantitative
 
 #### 1. Compound Annual Growth Rate (CAGR)
 
-$$
-\text{CAGR} = \left(\frac{V_{\text{Final}}}{V_{\text{Initial}}}\right)^{\frac{365.25}{D}} - 1.0
-$$
+$$\text{CAGR} = \left(\frac{V_{final}}{V_{initial}}\right)^{\frac{365.25}{D}} - 1$$
 *Where $D$ represents total days in the backtest period.*
 
 #### 2. Sharpe Ratio
 
-$$
-\text{Sharpe} = \frac{\overline{R_d - R_f}}{\sigma(R_d)} \cdot \sqrt{252}
-$$
-*Where $R_d$ is daily returns, $R_f$ is risk-free rate, and daily standard deviation is normalized over 252 trading days.*
+$$\text{Sharpe} = \frac{\text{Mean}(R - R_f)}{\text{Std}(R)} \cdot \sqrt{252}$$
+*Where $R$ is daily returns, $R_f$ is risk-free rate, and daily standard deviation is normalized over 252 trading days.*
 
 #### 3. Sortino Ratio
 
-$$
-\text{Sortino} = \frac{\overline{R_d - R_f}}{\sigma_{\text{downside}}(R_d)} \cdot \sqrt{252}
-$$
-*Where $\sigma_{\text{downside}}$ represents the standard deviation of negative daily returns ($R_d < R_f$).*
+$$\text{Sortino} = \frac{\text{Mean}(R - R_f)}{\text{Std}_{downside}(R)} \cdot \sqrt{252}$$
+*Where $\text{Std}_{downside}(R)$ represents the standard deviation of negative daily returns ($R < R_f$).*
 
 #### 4. Maximum Drawdown (MDD)
 
-$$
-\text{Drawdown}_t = \frac{E_t - \max_{0 \le i \le t}(E_i)}{\max_{0 \le i \le t}(E_i)}
-$$
+$$\text{Drawdown}_t = \frac{E_t - \max(E_{0 \dots t})}{\max(E_{0 \dots t})}$$
 
-$$
-\text{MDD} = \min_{0 \le t \le T}(\text{Drawdown}_t)
-$$
+$$\text{Max Drawdown} = \min(\text{Drawdown})$$
 *Where $E_t$ represents the portfolio equity at day $t$.*
 
 ---
